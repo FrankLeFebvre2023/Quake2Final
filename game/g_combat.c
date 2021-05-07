@@ -574,3 +574,45 @@ void T_RadiusDamage (edict_t *inflictor, edict_t *attacker, float damage, edict_
 		}
 	}
 }
+
+void T_DamageOverTime(edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, int radius, int time, int interval, int mod)
+{
+	float	points;
+	edict_t	*ent = NULL;
+	vec3_t	v;
+	vec3_t	dir;
+
+	while ((ent = findradius(ent, inflictor->s.origin, radius)) != NULL)
+	{
+		if (ent == ignore)
+			continue;
+		if (!ent->takedamage)
+			continue;
+
+		VectorAdd(ent->mins, ent->maxs, v);
+		VectorMA(ent->s.origin, 0.5, v, v);
+		VectorSubtract(inflictor->s.origin, v, v);
+		points = damage - 0.5 * VectorLength(v);
+		if (ent == attacker)
+			points = points * 0.5;
+		if (points > 0)
+		{
+			if (CanDamage(ent, inflictor))
+			{
+				for (int i = 0; i <= time; i += interval){
+					VectorSubtract(ent->s.origin, inflictor->s.origin, dir);
+					T_Damage(ent, inflictor, attacker, dir, inflictor->s.origin, vec3_origin, (int)points, (int)points, DAMAGE_RADIUS, mod);
+				}
+			}
+		}
+		else{
+			if (CanDamage(ent, inflictor))
+			{
+				for (int i = 0; i <= time; i += interval){
+					VectorSubtract(ent->s.origin, inflictor->s.origin, dir);
+					T_Damage(ent, inflictor, attacker, dir, inflictor->s.origin, vec3_origin, 2, 2, DAMAGE_RADIUS, mod);
+				}
+			}
+		}
+	}
+}

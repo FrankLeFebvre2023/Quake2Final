@@ -269,7 +269,7 @@ void NoAmmoWeaponChange (edict_t *ent)
 		ent->client->newweapon = FindItem ("shotgun");
 		return;
 	}
-	ent->client->newweapon = FindItem ("blaster");
+	ent->client->newweapon = FindItem ("sword");
 }
 
 /*
@@ -553,7 +553,7 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	int		speed;
 	float	radius;
 
-	radius = damage+40;
+	//radius = damage+40;
 	if (is_quad)
 		damage *= 4;
 
@@ -561,7 +561,7 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 
-	timer = ent->client->grenade_time - level.time;
+	//timer = ent->client->grenade_time - level.time;
 	speed = GRENADE_MINSPEED + (GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / GRENADE_TIMER);
 	fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held);
 
@@ -655,7 +655,7 @@ void Weapon_Grenade (edict_t *ent)
 			}
 
 			// they waited too long, detonate it in their hand
-			if (!ent->client->grenade_blew_up && level.time >= ent->client->grenade_time)
+			/*if (!ent->client->grenade_blew_up && level.time >= ent->client->grenade_time)
 			{
 				ent->client->weapon_sound = 0;
 				weapon_grenade_fire (ent, true);
@@ -676,7 +676,7 @@ void Weapon_Grenade (edict_t *ent)
 				{
 					return;
 				}
-			}
+			}*/
 		}
 
 		if (ent->client->ps.gunframe == 12)
@@ -765,7 +765,7 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 	int		radius_damage;
 
 	damage = 100 + (int)(random() * 20.0);
-	radius_damage = 120;
+	radius_damage = 10;
 	damage_radius = 120;
 	if (is_quad)
 	{
@@ -1186,7 +1186,7 @@ void weapon_shotgun_fire (edict_t *ent)
 	vec3_t		start;
 	vec3_t		forward, right;
 	vec3_t		offset;
-	int			damage = 4;
+	int			damage = 20;
 	int			kick = 8;
 
 	if (ent->client->ps.gunframe == 9)
@@ -1203,16 +1203,16 @@ void weapon_shotgun_fire (edict_t *ent)
 	VectorSet(offset, 0, 8,  ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 
-	if (is_quad)
+	/*if (is_quad)
 	{
 		damage *= 4;
 		kick *= 4;
-	}
+	}*/
 
 	if (deathmatch->value)
 		fire_shotgun (ent, start, forward, damage, kick, 500, 500, DEFAULT_DEATHMATCH_SHOTGUN_COUNT, MOD_SHOTGUN);
 	else
-		fire_shotgun (ent, start, forward, damage, kick, 500, 500, DEFAULT_SHOTGUN_COUNT, MOD_SHOTGUN);
+		fire_grenade (ent, start, forward, damage, 500, 100000, 1);
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -1314,8 +1314,8 @@ void weapon_railgun_fire (edict_t *ent)
 	}
 	else
 	{
-		damage = 150;
-		kick = 250;
+		damage = 15;
+		kick = 150;
 	}
 
 	if (is_quad)
@@ -1331,16 +1331,16 @@ void weapon_railgun_fire (edict_t *ent)
 
 	VectorSet(offset, 0, 7,  ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-	fire_rail (ent, start, forward, damage, kick);
+	fire_blaster (ent, start, forward, damage, 1000, 4, 0);
 
 	// send muzzle flash
-	gi.WriteByte (svc_muzzleflash);
+	/*gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
 	gi.WriteByte (MZ_RAILGUN | is_silenced);
-	gi.multicast (ent->s.origin, MULTICAST_PVS);
+	gi.multicast (ent->s.origin, MULTICAST_PVS);*/
 
 	ent->client->ps.gunframe++;
-	PlayerNoise(ent, start, PNOISE_WEAPON);
+//	PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
 		ent->client->pers.inventory[ent->client->ammo_index]--;
@@ -1431,4 +1431,61 @@ void Weapon_BFG (edict_t *ent)
 }
 
 
-//======================================================================
+//======================================================================\
+
+/*
+==============================================
+SWORD
+==============================================
+*/
+
+
+
+void Fire_Sword(edict_t *ent)
+{
+	int	i;
+	vec3_t		start;
+	vec3_t		forward, right;
+	vec3_t		angles;
+	int			damage = 10; 
+	int			kick = 0; 
+	vec3_t		offset;
+
+	if (ent -> client -> ps.gunframe == 11 ) 
+	{
+		ent -> client -> ps.gunframe++;
+		return;
+	}
+
+	AngleVectors (ent -> client -> v_angle, forward, right, NULL);
+
+	VectorScale (forward, -2, ent -> client -> kick_origin);
+	ent -> client -> kick_angles[ 0 ] = -2;
+
+	VectorSet(offset, 0, 8, ent -> viewheight - 8 );
+	P_ProjectSource (ent -> client, ent -> s.origin, offset, forward, right, start); 
+
+	if (is_quad)
+	{
+		damage *= 4;
+		kick *= 4;
+	}
+
+	
+	VectorAdd (ent -> client -> v_angle, ent -> client -> kick_angles, angles);
+	AngleVectors (angles, forward, right, NULL);
+	VectorSet(offset, 0, 8, ent -> viewheight - 8 );
+	P_ProjectSource (ent -> client, ent -> s.origin, offset, forward, right, start);
+	fire_sword (ent, start, forward, 45, damage, 200, 1, MOD_SWORD); 
+
+	ent -> client -> ps.gunframe++;
+	PlayerNoise(ent, start, PNOISE_WEAPON); 
+}
+
+void Weapon_Sword (edict_t *ent)
+{
+	static int	pause_frames[ ] = { 8, 20, 0 };
+	static int	fire_frames[ ] = { 10, 0 }; 
+
+	Weapon_Generic (ent, 3, 9, 22, 24, pause_frames, fire_frames, Fire_Sword);
+}

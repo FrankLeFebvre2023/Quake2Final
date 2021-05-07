@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "g_local.h"
 #include "m_player.h"
 
-
 char *ClientTeam (edict_t *ent)
 {
 	char		*p;
@@ -899,7 +898,23 @@ void Cmd_PlayerList_f(edict_t *ent)
 	gi.cprintf(ent, PRINT_HIGH, "%s", text);
 }
 
+/*void Drain(edict_t *ent){
+	vec3_t end, forward;
+	trace_t tr;
 
+	VectorCopy(ent->s.origin, end);
+	AngleVectors(ent->client->v_angle, forward, NULL, NULL);
+	end[0] = end[0] + forward[0] * 250;
+	end[1] = end[1] + forward[1] * 250;
+	end[2] = end[2] + forward[2] * 250;
+
+	tr = gi.trace(ent->s.origin, NULL, NULL, end, ent, MASK_SHOT);
+	if (ent != NULL){
+		ent->enemy = tr.ent;
+		parasite_drain_attack(ent);
+	}
+}
+*/
 /*
 =================
 ClientCommand

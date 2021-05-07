@@ -601,6 +601,8 @@ typedef struct
 #define RF_SHELL_RED		1024
 #define	RF_SHELL_GREEN		2048
 #define RF_SHELL_BLUE		4096
+#define RF_SHELL_YELLOW     8192
+#define RF_SHELL_PURPLE     16384
 
 //ROGUE
 #define RF_IR_VISIBLE		0x00008000		// 32768
@@ -1008,6 +1010,7 @@ typedef enum
 #define	STAT_FLASHES			15		// cleared each frame, 1 = health, 2 = armor
 #define STAT_CHASE				16
 #define STAT_SPECTATOR			17
+#define STAT_SKYRIM_TEXT		18
 
 #define	MAX_STATS				32
 

@@ -654,6 +654,9 @@ char *single_statusbar =
 "xv	50 "
 "pic 0 "
 
+"xv 75 "
+"yb -50 "
+"string2 \"QUAKE-RIM MOD IS ACTIVE\" "
 // ammo
 "if 2 "
 "	xv	100 "
@@ -695,12 +698,11 @@ char *single_statusbar =
 "	xv	296 "
 "	pic	9 "
 "endif "
-
 //  help / weapon icon 
-"if 11 "
+/*"if 11 "
 "	xv	148 "
 "	pic	11 "
-"endif "
+"endif "*/
 ;
 
 char *dm_statusbar =
@@ -857,7 +859,7 @@ void SP_worldspawn (edict_t *ent)
 
 	snd_fry = gi.soundindex ("player/fry.wav");	// standing in lava / slime
 
-	PrecacheItem (FindItem ("Blaster"));
+	PrecacheItem (FindItem ("Sword"));
 
 	gi.soundindex ("player/lava1.wav");
 	gi.soundindex ("player/lava2.wav");

@@ -785,7 +785,7 @@ void G_SetClientEffects (edict_t *ent)
 	if (ent->flags & FL_GODMODE)
 	{
 		ent->s.effects |= EF_COLOR_SHELL;
-		ent->s.renderfx |= (RF_SHELL_RED|RF_SHELL_GREEN|RF_SHELL_BLUE);
+		ent->s.renderfx |= (RF_SHELL_RED|RF_SHELL_GREEN|RF_SHELL_BLUE|RF_SHELL_YELLOW|RF_SHELL_PURPLE);
 	}
 }
 

@@ -366,7 +366,7 @@ void fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int spee
 	bolt->s.effects |= effect;
 	VectorClear (bolt->mins);
 	VectorClear (bolt->maxs);
-	bolt->s.modelindex = gi.modelindex ("models/objects/laser/tris.md2");
+	bolt->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
 	bolt->s.sound = gi.soundindex ("misc/lasfly.wav");
 	bolt->owner = self;
 	bolt->touch = blaster_touch;
@@ -463,7 +463,7 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 		return;
 	}
 
-	if (!other->takedamage)
+	/*if (!other->takedamage)
 	{
 		if (ent->spawnflags & 1)
 		{
@@ -477,7 +477,7 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 			gi.sound (ent, CHAN_VOICE, gi.soundindex ("weapons/grenlb1b.wav"), 1, ATTN_NORM, 0);
 		}
 		return;
-	}
+	}*/
 
 	ent->enemy = other;
 	Grenade_Explode (ent);
@@ -497,14 +497,14 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	VectorScale (aimdir, speed, grenade->velocity);
 	VectorMA (grenade->velocity, 200 + crandom() * 10.0, up, grenade->velocity);
 	VectorMA (grenade->velocity, crandom() * 10.0, right, grenade->velocity);
-	VectorSet (grenade->avelocity, 300, 300, 300);
+	VectorSet (grenade->avelocity, 300, 300, 0);
 	grenade->movetype = MOVETYPE_BOUNCE;
 	grenade->clipmask = MASK_SHOT;
 	grenade->solid = SOLID_BBOX;
 	grenade->s.effects |= EF_GRENADE;
 	VectorClear (grenade->mins);
 	VectorClear (grenade->maxs);
-	grenade->s.modelindex = gi.modelindex ("models/objects/grenade/tris.md2");
+	grenade->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
 	grenade->owner = self;
 	grenade->touch = Grenade_Touch;
 	grenade->nextthink = level.time + timer;
@@ -537,7 +537,7 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 	grenade->s.effects |= EF_GRENADE;
 	VectorClear (grenade->mins);
 	VectorClear (grenade->maxs);
-	grenade->s.modelindex = gi.modelindex ("models/objects/grenade2/tris.md2");
+	grenade->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
 	grenade->owner = self;
 	grenade->touch = Grenade_Touch;
 	grenade->nextthink = level.time + timer;
@@ -605,6 +605,7 @@ void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *su
 	}
 
 	T_RadiusDamage(ent, ent->owner, ent->radius_dmg, other, ent->dmg_radius, MOD_R_SPLASH);
+	T_DamageOverTime(ent, ent->owner, ent->radius_dmg, other, ent->dmg_radius, 2000, 250, MOD_R_SPLASH);
 
 	gi.WriteByte (svc_temp_entity);
 	if (ent->waterlevel)
@@ -913,4 +914,56 @@ void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, f
 		check_dodge (self, bfg->s.origin, dir, speed);
 
 	gi.linkentity (bfg);
+}
+
+void fire_sword(edict_t *self, vec3_t start, vec3_t aim, int reach, int damage, int kick, int quiet, int mod){
+	vec3_t forward, right, up;
+	vec3_t v;
+	vec3_t point;
+	trace_t tr;
+
+	vectoangles(aim, v);
+	AngleVectors ( v, forward, right, up);    //
+	VectorNormalize ( forward);               //
+	VectorMA( start, reach, forward, point); // Aiming stuff
+
+	//see if the hit connects
+	tr = gi.trace( start, NULL, NULL, point, self, MASK_SHOT);
+	if( tr.fraction == 1.0)
+	{
+		if( ! quiet) //not needed, it&#39;s better to follow my later steps
+		//gi.sound (self, CHAN_WEAPON, gi.soundindex ("weapons/swish.wav"), 1, ATTN_NORM, 0);
+		return;
+	}
+
+	if( tr.ent -> takedamage == DAMAGE_YES || tr.ent -> takedamage == DAMAGE_AIM) // Make sure they took damage
+	{
+		// pull the player forward if you do damage
+		VectorMA( self -> velocity, 75, forward, self -> velocity); // Pull forward
+		VectorMA( self -> velocity, 75, up, self -> velocity); // Pull up a tad bit. You can&#39;t slide&#59;)
+
+		// do the damage
+		// FIXME - make the damage appear at right spot and direction
+		T_Damage ( tr.ent, self, self, vec3_origin, tr.ent -> s.origin, vec3_origin, damage, kick / 2,
+			DAMAGE_ENERGY, mod); // Time to Slice my friends
+		gi.sound( self, CHAN_WEAPON, gi.soundindex( " weapons / phitw1.wav" ) , 1, ATTN_IDLE, 0 ); // Used for my Punch. 
+		//Rename and use for whatever
+
+		if( ! quiet)
+		gi.sound ( self, CHAN_WEAPON, gi.soundindex ( " weapons / meatht.wav" ) , 1, ATTN_NORM, 0 ); // Don&#39;t change this. 
+		//This is only used if your weapon is not quiet.. Chainfist isn&#39;t quiet, knife is
+	}
+	else
+	{
+		if( ! quiet)
+		gi.sound ( self, CHAN_WEAPON, gi.soundindex ( " weapo ns / tink1.wav" ) , 1, ATTN_NORM, 0 ); //same as above
+
+		VectorScale ( tr.plane.normal, 256, point);
+		gi.WriteByte ( svc_temp_entity);
+		gi.WriteByte ( TE_SPARKS); //make sparks, not gunshot..
+		gi.WritePosition ( tr.endpos);
+		gi.WriteDir ( point);
+		gi.multicast ( tr.endpos, MULTICAST_PVS);
+		gi.sound ( self, CHAN_AUTO, gi.soundindex( " weapo ns / phitw2.wav" ), 1, ATTN_NORM, 0 );  //hit wall sound
+	}
 }
