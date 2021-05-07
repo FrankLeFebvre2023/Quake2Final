@@ -339,6 +339,26 @@ void M_SetEffects (edict_t *ent)
 		ent->s.effects |= EF_COLOR_SHELL;
 		ent->s.renderfx |= RF_SHELL_RED;
 	}
+	if (ent->monsterinfo.aiflags & AI_FLAME){
+		ent -> s.effects |= EF_COLOR_SHELL;
+		ent->s.renderfx |= RF_SHELL_RED;
+	}
+	if (ent->monsterinfo.aiflags & AI_ICE){
+		ent->s.effects |= EF_COLOR_SHELL;
+		ent->s.renderfx |= RF_SHELL_GREEN;
+	}
+	if (ent->monsterinfo.aiflags & AI_LIGHTNING){
+		ent->s.effects |= EF_COLOR_SHELL;
+		ent->s.renderfx |= RF_SHELL_BLUE;
+	}
+	if (ent->monsterinfo.aiflags & AI_VOID){
+		ent->s.effects |= EF_COLOR_SHELL;
+		ent->s.renderfx |= RF_SHELL_PURPLE;
+	}
+	if (ent->monsterinfo.aiflags & AI_LIGHT){
+		ent->s.effects |= EF_COLOR_SHELL;
+		ent->s.renderfx |= RF_SHELL_YELLOW;
+	}
 
 	if (ent->health <= 0)
 		return;

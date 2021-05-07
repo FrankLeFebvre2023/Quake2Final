@@ -139,6 +139,11 @@ typedef enum
 #define AI_COMBAT_POINT			0x00001000
 #define AI_MEDIC				0x00002000
 #define AI_RESURRECTING			0x00004000
+#define AI_FLAME				0x00008000
+#define AI_ICE					0x00010000
+#define AI_LIGHTNING			0x00020000
+#define AI_VOID					0x00040000
+#define AI_LIGHT				0x00080000
 
 //monster attack state
 #define AS_STRAIGHT				1
@@ -499,6 +504,7 @@ extern	int	body_armor_index;
 #define MOD_HIT				32
 #define MOD_TARGET_BLASTER	33
 #define MOD_FRIENDLY_FIRE	0x8000000
+#define MOD_SWORD           34
 
 extern	int	meansOfDeath;
 
@@ -655,6 +661,7 @@ qboolean OnSameTeam (edict_t *ent1, edict_t *ent2);
 qboolean CanDamage (edict_t *targ, edict_t *inflictor);
 void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir, vec3_t point, vec3_t normal, int damage, int knockback, int dflags, int mod);
 void T_RadiusDamage (edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, float radius, int mod);
+void T_DamageOverTime(edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, int radius, int time, int interval, int mod);
 
 // damage flags
 #define DAMAGE_RADIUS			0x00000001	// damage was indirect
